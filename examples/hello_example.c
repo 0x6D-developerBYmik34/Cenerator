@@ -18,7 +18,7 @@ int await_foo(coro_t *coro) {
 int await_yet(coro_t *coro) {
   static int c = 0;
   BEGIN_CORO();
-  с = 0;
+  c = 0;
 
   while(c < 50) {
     printf("await_yet");
@@ -30,18 +30,16 @@ int await_yet(coro_t *coro) {
   return c + 10;
 }
 
-typedef struct _foo_two_coro_params {
-  coro_params parent_params;
+CORO_PARAM_INIT(foo_two, {
   int some_num;
-} foo_two_coro_params;
-
+})
 int foo_two(coro_t *coro)
 {
   static int c = 0;
   BEGIN_CORO();
 
   printf(" hi ");
-  YIELD(((foo_two_coro_params*)coro->params)->some_num);
+  YIELD(GET_CORO_PARAM(foo_two, some_num));
   printf(" Name is Mike ");
   YIELD(3);
   printf(" its may posled ");
@@ -62,13 +60,11 @@ int main ()
 {
   printf("Hi");
 
-  foo_two_coro_params param = {
-    .some_num = 4
-  };
-
   coro_t my_coro = {0};
   coro_inintial(&my_coro, foo_two);
-  my_coro.params = (coro_params *)&param;
+  my_coro.params = ADD_CORO_PARAMS(foo_two, {
+    .some_num = 67
+  });
 
   while(!coro_is_done(&my_coro)) {
     printf(" %i ", coro_resume(&my_coro));
