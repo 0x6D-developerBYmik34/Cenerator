@@ -60,6 +60,32 @@
 })
 
 
+#pragma anon_struct on
+
+#define CORO_PARAM_INIT(name_f, block_anonim_struct) \
+    typedef struct name_f##_param_struct { \
+        coro_params parent_params; \
+        struct block_anonim_struct; \
+    } name_f##_param;
+    
+#pragma anon_struct off
+
+#define GET_NAME_CORO_PARAMS(name_f) name_f##_param
+
+#define GET_CORO_PARAM(name_f, name_p) ({ \
+    ((GET_NAME_CORO_PARAMS(name_f) *)coro->params)->name_p; \
+})
+
+#define SET_CORO_PARAM(name_f, name_p, value) ({ \
+    ((GET_NAME_CORO_PARAMS(name_f) *)coro->params)->name_p = (value); \
+})
+
+#define ADD_CORO_PARAMS(name_f, init_block) ({ \
+    static GET_NAME_CORO_PARAMS(name_f) instance = init_block; \
+    (coro_params *)&instance; \
+})
+
+
 typedef struct coro_t_ coro_t;
 typedef int (*coro_function_t) (coro_t *coro);
 typedef struct str_params_coro coro_params;
