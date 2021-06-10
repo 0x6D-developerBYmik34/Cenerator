@@ -1,2 +1,2 @@
 # Cenerator
-My realisation generators ala Python and simple coroutines in C.
+My implementation generators ala Python and simple coroutines on C lang.
